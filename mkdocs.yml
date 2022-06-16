@@ -1,7 +1,7 @@
 site_name: rePLS
 nav:
-- Thanh: thanh,md
-- Model: model.md
-- Source Configuration: source-configuration.md
+- Home: Home.md
+- Get started: introduction.md 
+- Reference: reference.md
 theme: readthedocs
 
