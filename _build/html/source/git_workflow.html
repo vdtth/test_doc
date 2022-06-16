@@ -1,0 +1,162 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Integration with GitHub &#8212; tutos 0.5 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Simple GitHub repo and ReadTheDocs set up" href="git_rtd.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="git_rtd.html" title="Simple GitHub repo and ReadTheDocs set up"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">tutos 0.5 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Integration with GitHub</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="integration-with-github">
+<h1>Integration with GitHub<a class="headerlink" href="#integration-with-github" title="Permalink to this heading">¶</a></h1>
+<p>For starter it’s necessary to say, that GitHub…</p>
+<p>…is awesome! If you don’t needed and you went through whole process above, you can probably save a lot of headaches just by using GitHub. You don’t need any special knowledge for start, but you will need to learn them on the fly while reading this tutorial (there is really a lot about git out there, google is your friend).</p>
+<p>The variant I propose here is very easy, scalable and fast. Probably the most easy and effective I’ve found.</p>
+<section id="why-to-use-it">
+<h2>Why to use it<a class="headerlink" href="#why-to-use-it" title="Permalink to this heading">¶</a></h2>
+<p>I was so happy when I deployd my first django project. But few weeks later I’ve found that it’s just not feeling right to make changes on live version of the website (sometimes refered as <em>production</em>). So I started to use GitHub and found a solution.</p>
+<p>Here I will cover this:
+For every your website you end up with one directory including three subdirectories.</p>
+<ol class="arabic simple">
+<li><p>First called <strong>production</strong> - it’s the one which is live on the internet - the one what <code class="docutils literal notranslate"><span class="pre">nginx</span></code> refers.</p></li>
+<li><p>Second called <strong>mydomain.git</strong> - this one is necessary for our github configuration. You will barely change there anything</p></li>
+<li><p>Last one - <strong>work_dir</strong> - the one where all changes are being made and is connected to GitHub</p></li>
+</ol>
+</section>
+<section id="workflow">
+<h2>Workflow<a class="headerlink" href="#workflow" title="Permalink to this heading">¶</a></h2>
+<p>Your work will look like this:</p>
+<ol class="arabic simple">
+<li><p>Your work_dir contains master branch. This branch can be pushed to production (to go live) anywhen! So when you want to make change to your website, you need create new branch (correctly named based on the change you are doing - e.g. <em>hotfix_plugin</em>, <em>typo_css</em>…) and when you finish and test this branch, you merge it to master.</p></li>
+<li><p>You push master to your GitHub repository</p></li>
+<li><p>You push master to your production folder on your computer</p></li>
+</ol>
+</section>
+<section id="set-it-all-up">
+<h2>Set it all up<a class="headerlink" href="#set-it-all-up" title="Permalink to this heading">¶</a></h2>
+<p>So how to do it? I suppose you have one working directory as we created in previous chapters.</p>
+<p>Now go to the place where you websites are stored. Mine is in <code class="docutils literal notranslate"><span class="pre">/var/www</span></code> and create this structure:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>mydomain
+├── mydomain.git
+├── production
+└── work_dir
+</pre></div>
+</div>
+<p>Go to <code class="docutils literal notranslate"><span class="pre">/var/www/mydomain.git</span></code> and type this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">init</span> <span class="o">--</span><span class="n">bare</span>
+</pre></div>
+</div>
+<p>this will create just git repository with some special folders. You don’t need to know anything about it. All you need to do is to create this file <code class="docutils literal notranslate"><span class="pre">/var/www/mydomain/mydomain.git/hooks/post-receive</span></code> and add this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/sh</span>
+<span class="n">git</span> <span class="o">--</span><span class="n">work</span><span class="o">-</span><span class="n">tree</span><span class="o">=/</span><span class="n">var</span><span class="o">/</span><span class="n">www</span><span class="o">/</span><span class="n">mydomain</span><span class="o">/</span><span class="n">production</span> <span class="o">--</span><span class="n">git</span><span class="o">-</span><span class="nb">dir</span><span class="o">=/</span><span class="n">var</span><span class="o">/</span><span class="n">www</span><span class="o">/</span><span class="n">mydomain</span><span class="o">/</span><span class="n">mydomain</span><span class="o">.</span><span class="n">git</span> <span class="n">checkout</span> <span class="o">-</span><span class="n">f</span>
+</pre></div>
+</div>
+<p>and make the script runable <code class="docutils literal notranslate"><span class="pre">chmod</span> <span class="pre">+x</span> <span class="pre">/var/www/mydomain/mydomain.git/hooks/post-receive</span></code></p>
+<p>Go to work_dir and paste there you current <em>production</em> code (the one from previous chapters). Now you need to make a GitHub repository from that. The best guide is this one: <a class="reference external" href="https://help.github.com/articles/adding-an-existing-project-to-github-using-the-command-line/">How to add existing folder to GitHub</a>. (Maybe you’ll need to <a class="reference external" href="https://help.github.com/articles/generating-ssh-keys/">generate SSH key</a>). Is it working? Great.</p>
+<blockquote>
+<div><p>Note: It’s very good to make git repositories as small as possible, so don’t add to repository files which are not necessary or you backup them somewhere else. But virtualenv is a good thing to add there to IMHO.</p>
+</div></blockquote>
+<p>Now just add another remote, which will point to our created git repository. Every time we’ll want to go live with master, we’ll push changes to this git repository and it will take care to transfer our files to production. So in work_dir type:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">remote</span> <span class="n">add</span> <span class="n">production</span> <span class="n">file</span><span class="p">::</span><span class="o">///</span><span class="n">var</span><span class="o">/</span><span class="n">www</span><span class="o">/</span><span class="n">mydomain</span><span class="o">/</span><span class="n">mydomain</span><span class="o">.</span><span class="n">git</span>
+</pre></div>
+</div>
+<p>and that’s all. When you now want to push changes to production, type <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">push</span> <span class="pre">production</span> <span class="pre">master</span></code>. Congratulations!</p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Integration with GitHub</a><ul>
+<li><a class="reference internal" href="#why-to-use-it">Why to use it</a></li>
+<li><a class="reference internal" href="#workflow">Workflow</a></li>
+<li><a class="reference internal" href="#set-it-all-up">Set it all up</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="git_rtd.html"
+                          title="previous chapter">Simple GitHub repo and ReadTheDocs set up</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/source/git_workflow.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="git_rtd.html" title="Simple GitHub repo and ReadTheDocs set up"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">tutos 0.5 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Integration with GitHub</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014, kotrfa.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.1.
+    </div>
+  </body>
+</html>
