@@ -1,0 +1,7 @@
+site_name: rePLS
+nav:
+- abc: index.md
+- def: model.md
+- Source Configuration: source-configuration.md
+theme: readthedocs
+
